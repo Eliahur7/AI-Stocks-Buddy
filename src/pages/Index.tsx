@@ -1,45 +1,13 @@
-import { useState } from 'react';
 import { TickerSearch } from '@/components/TickerSearch';
 import { StockHeader } from '@/components/StockHeader';
 import { FundamentalsGrid } from '@/components/FundamentalsGrid';
 import { RecommendationCard } from '@/components/RecommendationCard';
-import { getStockData, analyzeStock } from '@/lib/stockData';
-import { StockFundamentals, StockAnalysis } from '@/types/stock';
+import { useStockData } from '@/hooks/useStockData';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Index = () => {
-  const [stock, setStock] = useState<StockFundamentals | null>(null);
-  const [analysis, setAnalysis] = useState<StockAnalysis | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleSearch = async (symbol: string) => {
-    setIsLoading(true);
-    setError(null);
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    const data = getStockData(symbol);
-    
-    if (data) {
-      setStock(data);
-      setAnalysis(analyzeStock(data));
-    } else {
-      setError(`No data found for ticker "${symbol}". Try AAPL, MSFT, NVDA, TSLA, or JPM.`);
-      setStock(null);
-      setAnalysis(null);
-    }
-    
-    setIsLoading(false);
-  };
-
-  const handleReset = () => {
-    setStock(null);
-    setAnalysis(null);
-    setError(null);
-  };
+  const { stock, analysis, isLoading, error, searchStock, reset } = useStockData();
 
   return (
     <div className="min-h-screen bg-background">
@@ -49,7 +17,7 @@ const Index = () => {
       <div className="relative z-10 container mx-auto px-4 py-8 md:py-12">
         {!stock ? (
           <div className="flex flex-col items-center justify-center min-h-[80vh]">
-            <TickerSearch onSearch={handleSearch} isLoading={isLoading} />
+            <TickerSearch onSearch={searchStock} isLoading={isLoading} />
             
             {error && (
               <div className="mt-6 flex items-center gap-2 text-destructive bg-destructive/10 px-4 py-3 rounded-lg animate-fade-in">
@@ -63,7 +31,7 @@ const Index = () => {
             {/* Back button */}
             <Button
               variant="ghost"
-              onClick={handleReset}
+              onClick={reset}
               className="text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
