@@ -8,7 +8,7 @@ interface TickerSearchProps {
   isLoading: boolean;
 }
 
-const popularTickers = ['AAPL', 'NVDA', 'RKLB', 'CEG', 'SMCI'];
+const popularTickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'JPM'];
 
 export function TickerSearch({ onSearch, isLoading }: TickerSearchProps) {
   const [input, setInput] = useState('');
@@ -25,7 +25,7 @@ export function TickerSearch({ onSearch, isLoading }: TickerSearchProps) {
       <div className="text-center space-y-2">
         <h1 className="text-4xl font-bold gradient-text">Stock Analyzer</h1>
         <p className="text-muted-foreground">
-          Enter a stock ticker to get comprehensive fundamentals and AI-powered recommendations
+          Enter any S&P 500 ticker to get live fundamentals and AI-powered recommendations
         </p>
       </div>
 
