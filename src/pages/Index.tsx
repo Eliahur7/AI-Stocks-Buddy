@@ -1,22 +1,39 @@
+import { useState } from 'react';
 import { TickerSearch } from '@/components/TickerSearch';
 import { StockHeader } from '@/components/StockHeader';
 import { FundamentalsGrid } from '@/components/FundamentalsGrid';
 import { RecommendationCard } from '@/components/RecommendationCard';
+import { UserMenu } from '@/components/UserMenu';
+import { WatchlistPanel } from '@/components/WatchlistPanel';
 import { useStockData } from '@/hooks/useStockData';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Toaster } from '@/components/ui/toaster';
 
 const Index = () => {
   const { stock, analysis, isLoading, error, searchStock, reset } = useStockData();
+  const [showWatchlist, setShowWatchlist] = useState(false);
+
+  const handleSelectFromWatchlist = (symbol: string) => {
+    searchStock(symbol);
+  };
 
   return (
     <div className="min-h-screen bg-background">
       {/* Background gradient */}
       <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none" />
       
+      {/* Header with user menu */}
+      <header className="relative z-20 border-b border-border/50">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          <h1 className="text-lg font-semibold gradient-text">AI Stocks</h1>
+          <UserMenu onShowWatchlist={() => setShowWatchlist(true)} />
+        </div>
+      </header>
+
       <div className="relative z-10 container mx-auto px-4 py-8 md:py-12">
         {!stock ? (
-          <div className="flex flex-col items-center justify-center min-h-[80vh]">
+          <div className="flex flex-col items-center justify-center min-h-[70vh]">
             <TickerSearch onSearch={searchStock} isLoading={isLoading} />
             
             {error && (
@@ -63,6 +80,15 @@ const Index = () => {
           </div>
         )}
       </div>
+
+      {/* Watchlist Panel */}
+      <WatchlistPanel
+        open={showWatchlist}
+        onOpenChange={setShowWatchlist}
+        onSelectStock={handleSelectFromWatchlist}
+      />
+
+      <Toaster />
     </div>
   );
 };
