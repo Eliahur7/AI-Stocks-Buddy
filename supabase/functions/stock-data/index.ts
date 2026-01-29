@@ -91,6 +91,8 @@ serve(async (req) => {
 
     const baseUrl = 'https://financialmodelingprep.com/api/v3';
 
+    console.log(`Fetching data for symbol: ${symbol}`);
+
     // Fetch all data in parallel
     const [quoteRes, profileRes, ratiosRes, growthRes, incomeRes] = await Promise.all([
       fetch(`${baseUrl}/quote/${symbol}?apikey=${apiKey}`),
@@ -101,25 +103,38 @@ serve(async (req) => {
     ]);
 
     const [quoteData, profileData, ratiosData, growthData, incomeData] = await Promise.all([
-      quoteRes.json() as Promise<FMPQuote[]>,
-      profileRes.json() as Promise<FMPProfile[]>,
-      ratiosRes.json() as Promise<FMPRatios[]>,
-      growthRes.json() as Promise<FMPGrowth[]>,
-      incomeRes.json() as Promise<FMPIncomeStatement[]>,
+      quoteRes.json(),
+      profileRes.json(),
+      ratiosRes.json(),
+      growthRes.json(),
+      incomeRes.json(),
     ]);
 
-    if (!quoteData?.length || !profileData?.length) {
+    console.log('Quote response:', JSON.stringify(quoteData));
+    console.log('Profile response:', JSON.stringify(profileData));
+
+    // Check for API errors (FMP returns object with error message when there's an issue)
+    if (quoteData?.['Error Message'] || profileData?.['Error Message']) {
+      console.error('FMP API Error:', quoteData?.['Error Message'] || profileData?.['Error Message']);
+      return new Response(
+        JSON.stringify({ error: 'API error - please check API key validity' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!Array.isArray(quoteData) || !quoteData.length || !Array.isArray(profileData) || !profileData.length) {
+      console.log('No data found - quoteData:', typeof quoteData, 'profileData:', typeof profileData);
       return new Response(
         JSON.stringify({ error: `No data found for ticker "${symbol}"` }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const quote = quoteData[0];
-    const profile = profileData[0];
-    const ratios = ratiosData?.[0] || {};
-    const growth = growthData?.[0] || {};
-    const income = incomeData?.[0] || {};
+    const quote = quoteData[0] as FMPQuote;
+    const profile = profileData[0] as FMPProfile;
+    const ratios = (Array.isArray(ratiosData) ? ratiosData[0] : {}) as Partial<FMPRatios>;
+    const growth = (Array.isArray(growthData) ? growthData[0] : {}) as Partial<FMPGrowth>;
+    const income = (Array.isArray(incomeData) ? incomeData[0] : {}) as Partial<FMPIncomeStatement>;
 
     // Build standardized response
     const stockData = {
