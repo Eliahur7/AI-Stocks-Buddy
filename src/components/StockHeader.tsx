@@ -1,4 +1,5 @@
 import { StockFundamentals } from '@/types/stock';
+import { WatchlistButton } from './WatchlistButton';
 import { TrendingUp, TrendingDown, Building2 } from 'lucide-react';
 
 interface StockHeaderProps {
@@ -17,6 +18,7 @@ export function StockHeader({ stock }: StockHeaderProps) {
             <span className="px-2 py-1 text-xs font-medium bg-secondary rounded-md text-secondary-foreground">
               {stock.sector}
             </span>
+            <WatchlistButton symbol={stock.symbol} />
           </div>
           <h2 className="text-xl font-semibold text-foreground">{stock.companyName}</h2>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
