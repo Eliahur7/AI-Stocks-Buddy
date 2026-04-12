@@ -1,4 +1,4 @@
-# Welcome to your Lovable project
+# AI Stock Advisor - by Ran Eliahu
 
 ## Project info
 
