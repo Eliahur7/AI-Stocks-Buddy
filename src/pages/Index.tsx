@@ -5,13 +5,15 @@ import { FundamentalsGrid } from '@/components/FundamentalsGrid';
 import { RecommendationCard } from '@/components/RecommendationCard';
 import { UserMenu } from '@/components/UserMenu';
 import { WatchlistPanel } from '@/components/WatchlistPanel';
+import { StockChart } from '@/components/StockChart';
+import { NewsFeed } from '@/components/NewsFeed';
 import { useStockData } from '@/hooks/useStockData';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/toaster';
 
 const Index = () => {
-  const { stock, analysis, isLoading, error, searchStock, reset } = useStockData();
+  const { stock, analysis, isLoading, isAnalysisLoading, error, searchStock, reset } = useStockData();
   const [showWatchlist, setShowWatchlist] = useState(false);
 
   const handleSelectFromWatchlist = (symbol: string) => {
@@ -59,15 +61,29 @@ const Index = () => {
             <StockHeader stock={stock} />
 
             <div className="grid lg:grid-cols-3 gap-6">
-              {/* Fundamentals - takes 2 columns on large screens */}
-              <div className="lg:col-span-2">
+              {/* Main Column - takes 2 columns on large screens */}
+              <div className="lg:col-span-2 flex flex-col gap-6">
+                {stock.historical && (
+                  <StockChart data={stock.historical} changePercent={stock.changePercent} />
+                )}
                 <FundamentalsGrid stock={stock} />
               </div>
 
-              {/* Recommendation - takes 1 column */}
-              <div className="lg:col-span-1">
-                {analysis && (
+              {/* Sidebar Column - takes 1 column */}
+              <div className="lg:col-span-1 flex flex-col gap-6">
+                {isAnalysisLoading ? (
+                  <div className="glass-card p-6 flex flex-col items-center justify-center min-h-[300px]">
+                    <div className="h-10 w-10 rounded-full border-4 border-primary border-t-transparent animate-spin mb-4" />
+                    <p className="text-muted-foreground font-medium animate-pulse">Gemini AI is analyzing...</p>
+                  </div>
+                ) : analysis ? (
                   <RecommendationCard analysis={analysis} symbol={stock.symbol} />
+                ) : null}
+
+                {stock.news && stock.news.length > 0 && (
+                  <div className="h-[400px]">
+                    <NewsFeed news={stock.news} />
+                  </div>
                 )}
               </div>
             </div>

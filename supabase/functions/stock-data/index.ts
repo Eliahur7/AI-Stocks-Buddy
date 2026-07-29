@@ -64,6 +64,26 @@ interface FMPIncomeStatement {
   netIncome: number;
 }
 
+interface FMPHistoricalPrice {
+  date: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+
+interface FMPNews {
+  symbol: string;
+  publishedDate: string;
+  title: string;
+  image: string;
+  site: string;
+  text: string;
+  url: string;
+}
+
+
 serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -94,20 +114,24 @@ serve(async (req) => {
     console.log(`Fetching data for symbol: ${symbol}`);
 
     // Fetch all data in parallel
-    const [quoteRes, profileRes, ratiosRes, growthRes, incomeRes] = await Promise.all([
+    const [quoteRes, profileRes, ratiosRes, growthRes, incomeRes, historicalRes, newsRes] = await Promise.all([
       fetch(`${baseUrl}/quote/${symbol}?apikey=${apiKey}`),
       fetch(`${baseUrl}/profile/${symbol}?apikey=${apiKey}`),
       fetch(`${baseUrl}/ratios-ttm/${symbol}?apikey=${apiKey}`),
       fetch(`${baseUrl}/financial-growth/${symbol}?limit=1&apikey=${apiKey}`),
       fetch(`${baseUrl}/income-statement/${symbol}?limit=1&apikey=${apiKey}`),
+      fetch(`${baseUrl}/historical-price-full/${symbol}?timeseries=90&apikey=${apiKey}`),
+      fetch(`${baseUrl}/stock_news?tickers=${symbol}&limit=5&apikey=${apiKey}`),
     ]);
 
-    const [quoteData, profileData, ratiosData, growthData, incomeData] = await Promise.all([
+    const [quoteData, profileData, ratiosData, growthData, incomeData, historicalData, newsData] = await Promise.all([
       quoteRes.json(),
       profileRes.json(),
       ratiosRes.json(),
       growthRes.json(),
       incomeRes.json(),
+      historicalRes.json(),
+      newsRes.json(),
     ]);
 
     console.log('Quote response:', JSON.stringify(quoteData));
@@ -135,6 +159,12 @@ serve(async (req) => {
     const ratios = (Array.isArray(ratiosData) ? ratiosData[0] : {}) as Partial<FMPRatios>;
     const growth = (Array.isArray(growthData) ? growthData[0] : {}) as Partial<FMPGrowth>;
     const income = (Array.isArray(incomeData) ? incomeData[0] : {}) as Partial<FMPIncomeStatement>;
+    
+    // Sort historical data oldest to newest for charts
+    const historical = (historicalData?.historical || []) as FMPHistoricalPrice[];
+    historical.reverse();
+    
+    const news = (Array.isArray(newsData) ? newsData : []) as FMPNews[];
 
     // Build standardized response
     const stockData = {
@@ -168,6 +198,8 @@ serve(async (req) => {
       fiftyTwoWeekHigh: quote.yearHigh || 0,
       fiftyTwoWeekLow: quote.yearLow || 0,
       averageVolume: quote.avgVolume || 0,
+      historical: historical,
+      news: news,
     };
 
     return new Response(

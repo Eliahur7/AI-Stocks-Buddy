@@ -29,6 +29,23 @@ export interface StockFundamentals {
   fiftyTwoWeekHigh: number;
   fiftyTwoWeekLow: number;
   averageVolume: number;
+  historical?: {
+    date: string;
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+    volume: number;
+  }[];
+  news?: {
+    symbol: string;
+    publishedDate: string;
+    title: string;
+    image: string;
+    site: string;
+    text: string;
+    url: string;
+  }[];
 }
 
 export type Recommendation = 'buy' | 'hold' | 'sell';
