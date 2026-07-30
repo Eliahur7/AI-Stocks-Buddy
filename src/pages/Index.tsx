@@ -5,10 +5,11 @@ import { FundamentalsGrid } from '@/components/FundamentalsGrid';
 import { RecommendationCard } from '@/components/RecommendationCard';
 import { UserMenu } from '@/components/UserMenu';
 import { WatchlistPanel } from '@/components/WatchlistPanel';
+import { TechnicalAnalysisCard } from '@/components/TechnicalAnalysisCard';
 import { StockChart } from '@/components/StockChart';
 import { NewsFeed } from '@/components/NewsFeed';
 import { useStockData } from '@/hooks/useStockData';
-import { AlertCircle, ArrowLeft } from 'lucide-react';
+import { AlertCircle, ArrowLeft, LineChart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/toaster';
 
@@ -26,37 +27,45 @@ const Index = () => {
       <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none" />
       
       {/* Header with user menu */}
-      <header className="relative z-20 border-b border-border/50">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-lg font-semibold gradient-text">AI Stocks</h1>
+      <header className="relative z-20 border-b border-border/50 sticky top-0 bg-background/80 backdrop-blur-md">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
+          <div 
+            className="flex items-center gap-2 hidden sm:flex cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={reset}
+          >
+            <div className="bg-primary/10 p-1.5 rounded-lg flex items-center justify-center">
+              <LineChart className="h-5 w-5 text-primary" />
+            </div>
+            <h1 className="text-lg font-semibold gradient-text whitespace-nowrap">
+              AI Stocks Buddy
+            </h1>
+          </div>
+          <div className="flex-1 max-w-lg mx-auto">
+            <TickerSearch onSearch={searchStock} isLoading={isLoading} />
+          </div>
           <UserMenu onShowWatchlist={() => setShowWatchlist(true)} />
         </div>
       </header>
 
-      <div className="relative z-10 container mx-auto px-4 py-8 md:py-12">
+      <div className="relative z-10 container mx-auto px-4 py-6 md:py-8">
+        {error && !stock && (
+          <div className="mb-6 flex items-center justify-center gap-2 text-destructive bg-destructive/10 px-4 py-3 rounded-lg animate-fade-in max-w-lg mx-auto">
+            <AlertCircle className="h-5 w-5 flex-shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+        
         {!stock ? (
-          <div className="flex flex-col items-center justify-center min-h-[70vh]">
-            <TickerSearch onSearch={searchStock} isLoading={isLoading} />
-            
-            {error && (
-              <div className="mt-6 flex items-center gap-2 text-destructive bg-destructive/10 px-4 py-3 rounded-lg animate-fade-in">
-                <AlertCircle className="h-5 w-5 flex-shrink-0" />
-                <span>{error}</span>
-              </div>
-            )}
+          <div className="flex flex-col items-center justify-center min-h-[50vh] animate-fade-in">
+            <div className="glass-card p-8 text-center max-w-md w-full">
+              <h2 className="text-2xl font-bold mb-3 gradient-text">Welcome to AI Stocks Buddy</h2>
+              <p className="text-muted-foreground">
+                Search for a stock ticker above (e.g., AAPL, MSFT) to get AI-powered insights, fundamental data, and the latest news.
+              </p>
+            </div>
           </div>
         ) : (
           <div className="space-y-6 max-w-6xl mx-auto">
-            {/* Back button */}
-            <Button
-              variant="ghost"
-              onClick={reset}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              New Search
-            </Button>
-
             {/* Stock Header */}
             <StockHeader stock={stock} />
 
@@ -88,8 +97,13 @@ const Index = () => {
               </div>
             </div>
 
+            {/* Technical Analysis Section */}
+            {stock.technicals && (
+              <TechnicalAnalysisCard technicals={stock.technicals} symbol={stock.symbol} />
+            )}
+
             {/* Disclaimer */}
-            <div className="glass-card p-4 text-center text-xs text-muted-foreground">
+            <div className="glass-card p-4 text-center text-xs text-muted-foreground mt-8">
               <strong>Disclaimer:</strong> This analysis is for educational purposes only and should not be considered financial advice. 
               Always do your own research and consult with a qualified financial advisor before making investment decisions.
             </div>

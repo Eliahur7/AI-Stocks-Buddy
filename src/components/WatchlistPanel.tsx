@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Star, TrendingUp, TrendingDown, Loader2, Trash2, RefreshCw } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { getStockData } from '@/lib/stockData';
 
 interface WatchlistPanelProps {
   open: boolean;
@@ -30,39 +31,27 @@ export function WatchlistPanel({ open, onOpenChange, onSelectStock }: WatchlistP
     if (watchlist.length === 0) return;
     
     setLoadingQuotes(true);
-    const projectUrl = import.meta.env.VITE_SUPABASE_URL;
-    const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 500));
     
     const newQuotes: Record<string, StockQuote> = {};
     
-    await Promise.all(
-      watchlist.map(async (item) => {
-        try {
-          const response = await fetch(
-            `${projectUrl}/functions/v1/stock-data?symbol=${encodeURIComponent(item.symbol)}`,
-            {
-              method: 'GET',
-              headers: {
-                'Authorization': `Bearer ${anonKey}`,
-                'Content-Type': 'application/json',
-              },
-            }
-          );
-          
-          if (response.ok) {
-            const data = await response.json();
-            newQuotes[item.symbol] = {
-              symbol: data.symbol,
-              price: data.price,
-              changePercent: data.changePercent,
-              companyName: data.companyName,
-            };
-          }
-        } catch (error) {
-          console.error(`Error fetching quote for ${item.symbol}:`, error);
+    watchlist.forEach((item) => {
+      try {
+        const data = getStockData(item.symbol);
+        
+        if (data) {
+          newQuotes[item.symbol] = {
+            symbol: data.symbol,
+            price: data.price,
+            changePercent: data.changePercent,
+            companyName: data.companyName,
+          };
         }
-      })
-    );
+      } catch (error) {
+        console.error(`Error fetching quote for ${item.symbol}:`, error);
+      }
+    });
     
     setQuotes(newQuotes);
     setLoadingQuotes(false);

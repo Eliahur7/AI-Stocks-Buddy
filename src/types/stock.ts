@@ -46,6 +46,26 @@ export interface StockFundamentals {
     text: string;
     url: string;
   }[];
+  technicals?: TechnicalIndicators;
+}
+
+export interface TechnicalIndicators {
+  rsi: number;
+  macd: {
+    value: number;
+    signal: number;
+    histogram: number;
+  };
+  sma50: number;
+  sma200: number;
+  support: number;
+  resistance: number;
+}
+
+export interface TechnicalAnalysis {
+  momentum: 'Bullish' | 'Bearish' | 'Neutral';
+  trend: 'Uptrend' | 'Downtrend' | 'Sideways';
+  summary: string;
 }
 
 export type Recommendation = 'buy' | 'hold' | 'sell';

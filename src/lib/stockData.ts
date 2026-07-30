@@ -1,4 +1,4 @@
-import { StockFundamentals, StockAnalysis, Recommendation } from '@/types/stock';
+import { StockFundamentals, StockAnalysis, Recommendation, TechnicalIndicators, TechnicalAnalysis } from '@/types/stock';
 
 // Mock stock data for demo purposes
 const mockStocks: Record<string, StockFundamentals> = {
@@ -649,7 +649,66 @@ const mockStocks: Record<string, StockFundamentals> = {
 
 export function getStockData(symbol: string): StockFundamentals | null {
   const upperSymbol = symbol.toUpperCase().trim();
-  return mockStocks[upperSymbol] || null;
+  const stock = mockStocks[upperSymbol];
+  
+  if (stock && !stock.technicals) {
+    // Generate plausible technicals based on price and change
+    const isPositive = stock.changePercent >= 0;
+    const rsiBase = isPositive ? 55 : 45;
+    const rsi = Math.min(85, Math.max(15, rsiBase + (stock.changePercent * 3)));
+    
+    stock.technicals = {
+      rsi,
+      macd: {
+        value: stock.change * 0.5,
+        signal: stock.change * 0.4,
+        histogram: stock.change * 0.1
+      },
+      sma50: stock.price * (1 - (stock.changePercent / 100) * 0.2),
+      sma200: stock.price * (1 - (stock.changePercent / 100) * 0.8),
+      support: stock.fiftyTwoWeekLow + (stock.price - stock.fiftyTwoWeekLow) * 0.3,
+      resistance: stock.price + (stock.fiftyTwoWeekHigh - stock.price) * 0.7,
+    };
+  }
+  
+  return stock || null;
+}
+
+export function analyzeTechnicals(technicals: TechnicalIndicators): TechnicalAnalysis {
+  let momentum: 'Bullish' | 'Bearish' | 'Neutral' = 'Neutral';
+  let trend: 'Uptrend' | 'Downtrend' | 'Sideways' = 'Sideways';
+  
+  if (technicals.rsi > 55 && technicals.macd.histogram > 0) {
+    momentum = 'Bullish';
+  } else if (technicals.rsi < 45 && technicals.macd.histogram < 0) {
+    momentum = 'Bearish';
+  }
+
+  if (technicals.sma50 > technicals.sma200) {
+    trend = 'Uptrend';
+  } else if (technicals.sma50 < technicals.sma200) {
+    trend = 'Downtrend';
+  }
+
+  let summary = `The technical indicators suggest a ${momentum.toLowerCase()} momentum within an overall ${trend.toLowerCase()}. `;
+  
+  if (technicals.rsi > 70) {
+    summary += `With RSI at ${technicals.rsi.toFixed(1)}, the asset is entering overbought territory, suggesting potential exhaustion. `;
+  } else if (technicals.rsi < 30) {
+    summary += `With RSI at ${technicals.rsi.toFixed(1)}, the asset is oversold, which may attract value buyers. `;
+  } else {
+    summary += `The RSI sits in neutral territory at ${technicals.rsi.toFixed(1)}. `;
+  }
+
+  summary += `Current support is found around $${technicals.support.toFixed(2)} with near-term resistance at $${technicals.resistance.toFixed(2)}. `;
+  
+  if (technicals.macd.histogram > 0) {
+    summary += `MACD shows positive divergence, supporting upside movement.`;
+  } else {
+    summary += `MACD indicates negative divergence, signaling downside pressure.`;
+  }
+
+  return { momentum, trend, summary };
 }
 
 export function analyzeStock(fundamentals: StockFundamentals): StockAnalysis {
