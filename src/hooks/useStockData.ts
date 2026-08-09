@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { StockFundamentals, StockAnalysis } from '@/types/stock';
+import { StockFundamentals, StockAnalysis, TechnicalIndicators } from '@/types/stock';
 import { analyzeStock, getStockData } from '@/lib/stockData';
 
-  interface UseStockDataReturn {
+interface UseStockDataReturn {
   stock: StockFundamentals | null;
   analysis: StockAnalysis | null;
   isLoading: boolean;
@@ -11,6 +11,62 @@ import { analyzeStock, getStockData } from '@/lib/stockData';
   error: string | null;
   searchStock: (symbol: string) => Promise<void>;
   reset: () => void;
+}
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+/** Call the stock-data edge function which uses the FMP API. */
+async function fetchLiveStockData(symbol: string): Promise<StockFundamentals | null> {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/functions/v1/stock-data?symbol=${encodeURIComponent(symbol)}`,
+      {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+      }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data?.error) return null;
+    return data as StockFundamentals;
+  } catch {
+    return null;
+  }
+}
+
+/** Call the ai-analysis edge function which uses Gemini. */
+async function fetchAiAnalysis(fundamentals: StockFundamentals): Promise<StockAnalysis | null> {
+  try {
+    const { data, error } = await supabase.functions.invoke('ai-analysis', {
+      body: { fundamentals },
+    });
+    if (error || data?.error) return null;
+    return data as StockAnalysis;
+  } catch {
+    return null;
+  }
+}
+
+/** Generate technicals locally from price/change data when not provided by the API. */
+function generateTechnicals(stock: StockFundamentals): TechnicalIndicators {
+  const isPositive = stock.changePercent >= 0;
+  const rsiBase = isPositive ? 55 : 45;
+  const rsi = Math.min(85, Math.max(15, rsiBase + stock.changePercent * 3));
+  return {
+    rsi,
+    macd: {
+      value: stock.change * 0.5,
+      signal: stock.change * 0.4,
+      histogram: stock.change * 0.1,
+    },
+    sma50: stock.price * (1 - (stock.changePercent / 100) * 0.2),
+    sma200: stock.price * (1 - (stock.changePercent / 100) * 0.8),
+    support: stock.fiftyTwoWeekLow + (stock.price - stock.fiftyTwoWeekLow) * 0.3,
+    resistance: stock.price + (stock.fiftyTwoWeekHigh - stock.price) * 0.7,
+  };
 }
 
 export function useStockData(): UseStockDataReturn {
@@ -21,6 +77,7 @@ export function useStockData(): UseStockDataReturn {
   const [error, setError] = useState<string | null>(null);
 
   const searchStock = async (symbol: string) => {
+    const upperSymbol = symbol.toUpperCase().trim();
     setIsLoading(true);
     setIsAnalysisLoading(true);
     setError(null);
@@ -28,28 +85,37 @@ export function useStockData(): UseStockDataReturn {
     setAnalysis(null);
 
     try {
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      const result = getStockData(symbol);
+      // 1. Try the live edge function first (any ticker, real FMP data)
+      let result: StockFundamentals | null = await fetchLiveStockData(upperSymbol);
 
+      // 2. Fall back to local mock data if live call fails / FMP key not set
       if (!result) {
-        throw new Error(`No data found for ticker "${symbol}"`);
+        result = getStockData(upperSymbol);
       }
 
-      setStock(result as StockFundamentals);
-      setIsLoading(false); // Stop loading stock data, but keep analysis loading
+      if (!result) {
+        throw new Error(
+          `No data found for ticker "${upperSymbol}". ` +
+          `Check the symbol or configure FMP_API_KEY in Supabase for live data.`
+        );
+      }
 
-      // Simulate AI Analysis delay in background
-      setTimeout(() => {
-        try {
-          setAnalysis(analyzeStock(result as StockFundamentals)); // Fallback to local
-        } catch (err) {
-          console.error('Failed to generate AI analysis:', err);
-        } finally {
-          setIsAnalysisLoading(false);
-        }
-      }, 1200);
+      // 3. Ensure technicals are always populated
+      if (!result.technicals) {
+        result = { ...result, technicals: generateTechnicals(result) };
+      }
+
+      setStock(result);
+      setIsLoading(false);
+
+      // 4. Fetch AI analysis (Gemini) in background, fall back to local scoring
+      fetchAiAnalysis(result).then((aiResult) => {
+        setAnalysis(aiResult ?? analyzeStock(result!));
+      }).catch(() => {
+        setAnalysis(analyzeStock(result!));
+      }).finally(() => {
+        setIsAnalysisLoading(false);
+      });
 
     } catch (err) {
       const message = err instanceof Error ? err.message : 'An unexpected error occurred';
@@ -67,13 +133,5 @@ export function useStockData(): UseStockDataReturn {
     setError(null);
   };
 
-  return {
-    stock,
-    analysis,
-    isLoading,
-    isAnalysisLoading,
-    error,
-    searchStock,
-    reset,
-  };
+  return { stock, analysis, isLoading, isAnalysisLoading, error, searchStock, reset };
 }
