@@ -1,21 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TickerSearch } from '@/components/TickerSearch';
 import { StockHeader } from '@/components/StockHeader';
 import { FundamentalsGrid } from '@/components/FundamentalsGrid';
 import { RecommendationCard } from '@/components/RecommendationCard';
+import { FundamentalsExpertCard } from '@/components/FundamentalsExpertCard';
 import { UserMenu } from '@/components/UserMenu';
 import { WatchlistPanel } from '@/components/WatchlistPanel';
 import { TechnicalAnalysisCard } from '@/components/TechnicalAnalysisCard';
 import { StockChart } from '@/components/StockChart';
 import { NewsFeed } from '@/components/NewsFeed';
 import { useStockData } from '@/hooks/useStockData';
-import { AlertCircle, ArrowLeft, LineChart } from 'lucide-react';
+import { useFundamentalsExpert } from '@/hooks/useFundamentalsExpert';
+import { AlertCircle, LineChart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/toaster';
 
 const Index = () => {
   const { stock, analysis, isLoading, isAnalysisLoading, error, searchStock, reset } = useStockData();
+  const { expertAnalysis, isExpertLoading, expertError, runExpertAnalysis, clearExpertAnalysis } = useFundamentalsExpert();
   const [showWatchlist, setShowWatchlist] = useState(false);
+
+  // Auto-clear expert analysis when stock changes
+  useEffect(() => {
+    clearExpertAnalysis();
+  }, [stock?.symbol, clearExpertAnalysis]);
 
   const handleSelectFromWatchlist = (symbol: string) => {
     searchStock(symbol);
@@ -88,6 +96,16 @@ const Index = () => {
                 ) : analysis ? (
                   <RecommendationCard analysis={analysis} symbol={stock.symbol} />
                 ) : null}
+
+                {/* Fundamentals Expert Agent */}
+                <FundamentalsExpertCard
+                  analysis={expertAnalysis}
+                  isLoading={isExpertLoading}
+                  error={expertError}
+                  symbol={stock.symbol}
+                  onRun={() => runExpertAnalysis(stock)}
+                  hasStock={true}
+                />
 
                 {stock.news && stock.news.length > 0 && (
                   <div className="h-[400px]">

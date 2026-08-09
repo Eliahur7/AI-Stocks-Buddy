@@ -77,3 +77,21 @@ export interface StockAnalysis {
   risks: string[];
   summary: string;
 }
+
+export interface FundamentalsExpertAnalysis {
+  valuationScore: number;
+  profitabilityScore: number;
+  growthScore: number;
+  financialHealthScore: number;
+  shareholderValueScore: number;
+  overallScore: number;
+  valuationVerdict: string;
+  profitabilityVerdict: string;
+  growthVerdict: string;
+  financialHealthVerdict: string;
+  shareholderValueVerdict: string;
+  expertSummary: string;
+  strengths: string[];
+  concerns: string[];
+  investorProfile: string;
+}
