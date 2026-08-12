@@ -25,14 +25,14 @@ interface StatCardProps {
 
 function StatCard({ label, value, icon, subValue, isPositive }: StatCardProps) {
   return (
-    <div className="stat-card animate-fade-in">
-      <div className="flex items-start justify-between mb-1">
-        <span className="text-xs text-muted-foreground">{label}</span>
-        <span className="text-muted-foreground">{icon}</span>
+    <div className="stat-card px-2.5 py-1.5 animate-fade-in">
+      <div className="flex items-center justify-between">
+        <span className="text-[11px] font-medium text-muted-foreground leading-tight">{label}</span>
+        <span className="text-muted-foreground/70">{icon}</span>
       </div>
-      <div className="text-lg font-bold font-mono text-foreground">{value}</div>
+      <div className="text-base font-bold font-mono text-foreground leading-tight mt-0.5">{value}</div>
       {subValue && (
-        <div className={`text-xs font-medium ${
+        <div className={`text-[10px] font-medium leading-none mt-0.5 ${
           isPositive === undefined ? 'text-muted-foreground' :
           isPositive ? 'text-success' : 'text-destructive'
         }`}>
@@ -45,68 +45,68 @@ function StatCard({ label, value, icon, subValue, isPositive }: StatCardProps) {
 
 export function FundamentalsGrid({ stock }: FundamentalsGridProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Valuation */}
       <div>
-        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-foreground">
-          <DollarSign className="h-4 w-4 text-primary" />
+        <h3 className="text-xs font-semibold mb-1 flex items-center gap-1.5 text-foreground uppercase tracking-wide opacity-90">
+          <DollarSign className="h-3.5 w-3.5 text-primary" />
           Valuation
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-          <StatCard label="Market Cap" value={formatMarketCap(stock.marketCap)} icon={<BarChart3 className="h-3.5 w-3.5" />} />
-          <StatCard label="P/E Ratio" value={stock.peRatio.toFixed(2)} icon={<Scale className="h-3.5 w-3.5" />} subValue={`Fwd: ${stock.forwardPE.toFixed(2)}`} />
-          <StatCard label="PEG Ratio" value={stock.pegRatio.toFixed(2)} icon={<TrendingUp className="h-3.5 w-3.5" />} />
-          <StatCard label="P/B Ratio" value={stock.priceToBook.toFixed(2)} icon={<Banknote className="h-3.5 w-3.5" />} subValue={`P/S: ${stock.priceToSales.toFixed(2)}`} />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5">
+          <StatCard label="Market Cap" value={formatMarketCap(stock.marketCap)} icon={<BarChart3 className="h-3 w-3" />} />
+          <StatCard label="P/E Ratio" value={stock.peRatio.toFixed(2)} icon={<Scale className="h-3 w-3" />} subValue={`Fwd: ${stock.forwardPE.toFixed(2)}`} />
+          <StatCard label="PEG Ratio" value={stock.pegRatio.toFixed(2)} icon={<TrendingUp className="h-3 w-3" />} />
+          <StatCard label="P/B Ratio" value={stock.priceToBook.toFixed(2)} icon={<Banknote className="h-3 w-3" />} subValue={`P/S: ${stock.priceToSales.toFixed(2)}`} />
         </div>
       </div>
 
       {/* Growth */}
       <div>
-        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-foreground">
-          <TrendingUp className="h-4 w-4 text-primary" />
+        <h3 className="text-xs font-semibold mb-1 flex items-center gap-1.5 text-foreground uppercase tracking-wide opacity-90">
+          <TrendingUp className="h-3.5 w-3.5 text-primary" />
           Growth
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-          <StatCard label="EPS" value={`$${stock.eps.toFixed(2)}`} icon={<DollarSign className="h-3.5 w-3.5" />} subValue={`${stock.epsGrowth > 0 ? '+' : ''}${stock.epsGrowth.toFixed(1)}% YoY`} isPositive={stock.epsGrowth > 0} />
-          <StatCard label="Revenue" value={formatLargeNumber(stock.revenue)} icon={<BarChart3 className="h-3.5 w-3.5" />} subValue={`${stock.revenueGrowth > 0 ? '+' : ''}${stock.revenueGrowth.toFixed(1)}% YoY`} isPositive={stock.revenueGrowth > 0} />
-          <StatCard label="ROE" value={`${stock.roe.toFixed(1)}%`} icon={<Percent className="h-3.5 w-3.5" />} />
-          <StatCard label="ROA" value={`${stock.roa.toFixed(1)}%`} icon={<PieChart className="h-3.5 w-3.5" />} />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5">
+          <StatCard label="EPS" value={`$${stock.eps.toFixed(2)}`} icon={<DollarSign className="h-3 w-3" />} subValue={`${stock.epsGrowth > 0 ? '+' : ''}${stock.epsGrowth.toFixed(1)}% YoY`} isPositive={stock.epsGrowth > 0} />
+          <StatCard label="Revenue" value={formatLargeNumber(stock.revenue)} icon={<BarChart3 className="h-3 w-3" />} subValue={`${stock.revenueGrowth > 0 ? '+' : ''}${stock.revenueGrowth.toFixed(1)}% YoY`} isPositive={stock.revenueGrowth > 0} />
+          <StatCard label="ROE" value={`${stock.roe.toFixed(1)}%`} icon={<Percent className="h-3 w-3" />} />
+          <StatCard label="ROA" value={`${stock.roa.toFixed(1)}%`} icon={<PieChart className="h-3 w-3" />} />
         </div>
       </div>
 
       {/* Profitability */}
       <div>
-        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-foreground">
-          <PieChart className="h-4 w-4 text-primary" />
+        <h3 className="text-xs font-semibold mb-1 flex items-center gap-1.5 text-foreground uppercase tracking-wide opacity-90">
+          <PieChart className="h-3.5 w-3.5 text-primary" />
           Profitability
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-          <StatCard label="Gross Margin" value={stock.grossMargin ? `${stock.grossMargin.toFixed(1)}%` : 'N/A'} icon={<Percent className="h-3.5 w-3.5" />} />
-          <StatCard label="Oper. Margin" value={`${stock.operatingMargin.toFixed(1)}%`} icon={<Percent className="h-3.5 w-3.5" />} />
-          <StatCard label="Net Margin" value={`${stock.netMargin.toFixed(1)}%`} icon={<Percent className="h-3.5 w-3.5" />} />
-          <StatCard label="Div. Yield" value={stock.dividendYield ? `${stock.dividendYield.toFixed(2)}%` : 'None'} icon={<Banknote className="h-3.5 w-3.5" />} subValue={stock.payoutRatio ? `Payout: ${stock.payoutRatio.toFixed(1)}%` : undefined} />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5">
+          <StatCard label="Gross Margin" value={stock.grossMargin ? `${stock.grossMargin.toFixed(1)}%` : 'N/A'} icon={<Percent className="h-3 w-3" />} />
+          <StatCard label="Oper. Margin" value={`${stock.operatingMargin.toFixed(1)}%`} icon={<Percent className="h-3 w-3" />} />
+          <StatCard label="Net Margin" value={`${stock.netMargin.toFixed(1)}%`} icon={<Percent className="h-3 w-3" />} />
+          <StatCard label="Div. Yield" value={stock.dividendYield ? `${stock.dividendYield.toFixed(2)}%` : 'None'} icon={<Banknote className="h-3 w-3" />} subValue={stock.payoutRatio ? `Payout: ${stock.payoutRatio.toFixed(1)}%` : undefined} />
         </div>
       </div>
 
       {/* Financial Health */}
       <div>
-        <h3 className="text-sm font-semibold mb-2 flex items-center gap-2 text-foreground">
-          <Activity className="h-4 w-4 text-primary" />
+        <h3 className="text-xs font-semibold mb-1 flex items-center gap-1.5 text-foreground uppercase tracking-wide opacity-90">
+          <Activity className="h-3.5 w-3.5 text-primary" />
           Financial Health
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-          <StatCard label="Debt/Equity" value={`${stock.debtToEquity.toFixed(1)}%`} icon={<Scale className="h-3.5 w-3.5" />} />
-          <StatCard label="Current Ratio" value={stock.currentRatio ? stock.currentRatio.toFixed(2) : 'N/A'} icon={<Activity className="h-3.5 w-3.5" />} />
-          <StatCard label="Beta" value={stock.beta.toFixed(2)} icon={<TrendingUp className="h-3.5 w-3.5" />} />
-          <StatCard label="Avg Volume" value={formatLargeNumber(stock.averageVolume)} icon={<BarChart3 className="h-3.5 w-3.5" />} />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5">
+          <StatCard label="Debt/Equity" value={`${stock.debtToEquity.toFixed(1)}%`} icon={<Scale className="h-3 w-3" />} />
+          <StatCard label="Current Ratio" value={stock.currentRatio ? stock.currentRatio.toFixed(2) : 'N/A'} icon={<Activity className="h-3 w-3" />} />
+          <StatCard label="Beta" value={stock.beta.toFixed(2)} icon={<TrendingUp className="h-3 w-3" />} />
+          <StatCard label="Avg Volume" value={formatLargeNumber(stock.averageVolume)} icon={<BarChart3 className="h-3 w-3" />} />
         </div>
       </div>
 
       {/* 52-Week Range */}
-      <div className="glass-card p-3">
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="text-xs text-muted-foreground">52-Week Range</span>
-          <span className="text-xs font-mono text-muted-foreground">
+      <div className="glass-card px-3 py-2">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[11px] font-medium text-muted-foreground">52-Week Range</span>
+          <span className="text-[11px] font-mono text-muted-foreground">
             ${stock.fiftyTwoWeekLow.toFixed(2)} — ${stock.fiftyTwoWeekHigh.toFixed(2)}
           </span>
         </div>
@@ -120,7 +120,7 @@ export function FundamentalsGrid({ stock }: FundamentalsGridProps) {
             }}
           />
         </div>
-        <div className="flex justify-between mt-1 text-xs text-muted-foreground">
+        <div className="flex justify-between mt-0.5 text-[10px] text-muted-foreground">
           <span>Low</span>
           <span className="font-mono font-medium text-foreground">${stock.price.toFixed(2)}</span>
           <span>High</span>
