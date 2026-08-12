@@ -57,7 +57,7 @@ const Index = () => {
           </div>
 
           <div className="flex-1 max-w-xl mx-auto">
-            <TickerSearch onSearch={searchStock} isLoading={isLoading} compact={!!stock} />
+            {stock && <TickerSearch onSearch={searchStock} isLoading={isLoading} compact={true} />}
           </div>
 
           <UserMenu onShowWatchlist={() => setShowWatchlist(true)} />
