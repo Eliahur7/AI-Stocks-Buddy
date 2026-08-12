@@ -358,6 +358,7 @@ const mockStocks: Record<string, StockFundamentals> = {
 
 const knownNames: Record<string, { name: string; sector: string; industry: string; price: number; eps: number }> = {
   PGY: { name: 'Pagaya Technologies Ltd.', sector: 'Financial Services', industry: 'Financial Data & Stock Exchanges', price: 12.85, eps: 0.42 },
+  SPCX: { name: 'S&P 500 SPAC ETF', sector: 'Financial Services', industry: 'Exchange Traded Fund', price: 28.50, eps: 0.95 },
   INTC: { name: 'Intel Corporation', sector: 'Technology', industry: 'Semiconductors', price: 20.45, eps: 0.85 },
   DIS: { name: 'The Walt Disney Company', sector: 'Communication Services', industry: 'Entertainment', price: 95.80, eps: 4.25 },
   NFLX: { name: 'Netflix, Inc.', sector: 'Communication Services', industry: 'Entertainment', price: 685.20, eps: 18.50 },
@@ -530,23 +531,38 @@ export function analyzeStock(fundamentals: StockFundamentals): StockAnalysis {
   const risks: string[] = [];
 
   // Valuation analysis
-  if (fundamentals.peRatio < 15) {
+  if (fundamentals.peRatio < 15 && fundamentals.peRatio > 0) {
     score += 10;
     reasons.push('Attractive P/E ratio suggests undervaluation');
-  } else if (fundamentals.peRatio > 40) {
+  } else if (fundamentals.peRatio > 35) {
     score -= 10;
-    risks.push('High valuation multiple creates downside risk');
+    risks.push(`Elevated P/E ratio (${fundamentals.peRatio.toFixed(1)}x) creates valuation multiple risk`);
+  } else if (fundamentals.peRatio > 25) {
+    risks.push(`P/E ratio of ${fundamentals.peRatio.toFixed(1)}x limits margin of safety if growth slows`);
+  }
+
+  if (fundamentals.priceToSales > 8) {
+    risks.push(`Rich P/S ratio (${fundamentals.priceToSales.toFixed(1)}x) leaves stock vulnerable to revenue misses`);
   }
 
   if (fundamentals.pegRatio < 1.0 && fundamentals.pegRatio > 0) {
     score += 8;
     reasons.push('PEG ratio below 1.0 indicates value relative to growth');
+  } else if (fundamentals.pegRatio > 1.8) {
+    risks.push(`PEG ratio of ${fundamentals.pegRatio.toFixed(2)} indicates premium pricing relative to growth rate`);
   }
 
   // Profitability analysis
   if (fundamentals.operatingMargin > 20) {
     score += 10;
     reasons.push('Strong operating margins demonstrate pricing power');
+  }
+
+  if (fundamentals.netMargin < 0) {
+    score -= 12;
+    risks.push(`Unprofitable operations with negative net margin (${fundamentals.netMargin.toFixed(1)}%)`);
+  } else if (fundamentals.netMargin < 12) {
+    risks.push(`Modest net margin (${fundamentals.netMargin.toFixed(1)}%) offers narrow cushion against cost inflation`);
   }
 
   if (fundamentals.roe > 15) {
@@ -560,18 +576,24 @@ export function analyzeStock(fundamentals: StockFundamentals): StockAnalysis {
     reasons.push('Robust revenue growth signals business expansion');
   } else if (fundamentals.revenueGrowth < 0) {
     score -= 12;
-    risks.push('Declining revenue highlights top-line pressure');
+    risks.push(`Declining top-line revenue growth (${fundamentals.revenueGrowth.toFixed(1)}% YoY)`);
+  } else if (fundamentals.revenueGrowth < 8) {
+    risks.push(`Subdued revenue growth (${fundamentals.revenueGrowth.toFixed(1)}% YoY) may lag sector peers`);
   }
 
   if (fundamentals.epsGrowth > 20) {
     score += 8;
     reasons.push('Accelerating EPS growth supports price momentum');
+  } else if (fundamentals.epsGrowth < 0) {
+    risks.push(`Negative EPS growth momentum (${fundamentals.epsGrowth.toFixed(1)}% YoY)`);
   }
 
   // Balance sheet health
   if (fundamentals.debtToEquity > 150) {
     score -= 10;
-    risks.push('High leverage increases financial vulnerability');
+    risks.push(`High financial leverage (Debt/Equity ${fundamentals.debtToEquity.toFixed(1)}%) increases balance sheet risk`);
+  } else if (fundamentals.debtToEquity > 80) {
+    risks.push(`Moderate leverage (Debt/Equity ${fundamentals.debtToEquity.toFixed(1)}%) requires steady cash flow`);
   } else if (fundamentals.debtToEquity < 50) {
     score += 5;
     reasons.push('Conservative debt levels provide balance sheet safety');
@@ -579,7 +601,9 @@ export function analyzeStock(fundamentals: StockFundamentals): StockAnalysis {
 
   if (fundamentals.currentRatio < 1.0 && fundamentals.currentRatio > 0) {
     score -= 8;
-    risks.push('Current ratio below 1.0 suggests liquidity constraints');
+    risks.push(`Current ratio of ${fundamentals.currentRatio.toFixed(2)} signals short-term working capital pressure`);
+  } else if (fundamentals.currentRatio < 1.3 && fundamentals.currentRatio > 0) {
+    risks.push(`Tight current ratio (${fundamentals.currentRatio.toFixed(2)}) leaves narrow liquidity buffer`);
   }
 
   // Dividends
@@ -588,22 +612,38 @@ export function analyzeStock(fundamentals: StockFundamentals): StockAnalysis {
     reasons.push('Attractive dividend yield provides income');
   }
 
-  // Beta analysis
-  if (fundamentals.beta > 1.5) {
-    risks.push('Higher volatility than the overall market');
+  // Beta & Volatility analysis
+  if (fundamentals.beta > 1.8) {
+    risks.push(`High beta (${fundamentals.beta.toFixed(2)}) exposes shares to amplified market downturns`);
+  } else if (fundamentals.beta > 1.2) {
+    risks.push(`Above-average market volatility (beta ${fundamentals.beta.toFixed(2)})`);
   } else if (fundamentals.beta < 0.8) {
     reasons.push('Lower volatility provides stability');
   }
 
   // Price position
   const priceRange = fundamentals.fiftyTwoWeekHigh - fundamentals.fiftyTwoWeekLow;
-  const pricePosition = (fundamentals.price - fundamentals.fiftyTwoWeekLow) / priceRange;
+  const pricePosition = (fundamentals.price - fundamentals.fiftyTwoWeekLow) / Math.max(1, priceRange);
 
   if (pricePosition < 0.3) {
     score += 5;
     reasons.push('Trading near 52-week lows may offer value opportunity');
-  } else if (pricePosition > 0.9) {
-    risks.push('Trading near 52-week highs may limit upside');
+  } else if (pricePosition > 0.85) {
+    risks.push(`Trading near 52-week highs ($${fundamentals.price.toFixed(2)}) increases short-term pull-back risk`);
+  }
+
+  // Ensure due diligence: ALWAYS guarantee at least 3 thorough risks
+  const defaultRisks = [
+    `Macro rate shifts could compress valuation multiples in ${fundamentals.sector}`,
+    `Competitive intensity in ${fundamentals.industry} could exert pressure on profit margins`,
+    `Broader equity market volatility and sector rotation risk could impact near-term performance`,
+    `Execution risk on company growth initiatives and operational expansion`
+  ];
+
+  for (const fallbackRisk of defaultRisks) {
+    if (risks.length < 3 && !risks.includes(fallbackRisk)) {
+      risks.push(fallbackRisk);
+    }
   }
 
   // Determine recommendation from score

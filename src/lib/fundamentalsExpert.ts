@@ -168,30 +168,36 @@ export function scoreFundamentalsLocally(stock: StockFundamentals): Fundamentals
   if (dividendYield > 2)   strengths.push(`Attractive dividend yield (${dividendYield.toFixed(2)}%)`);
   if (pegRatio > 0 && pegRatio < 1.5) strengths.push(`Attractive PEG ratio (${pegRatio.toFixed(2)})`);
 
-  if (peRatio > 50)           concerns.push(`Elevated P/E ratio (${peRatio.toFixed(1)}x)`);
-  if (netMargin < 0)          concerns.push(`Negative net margin (${netMargin.toFixed(1)}%)`);
-  if (epsGrowth < 0)          concerns.push(`Declining EPS (${epsGrowth.toFixed(1)}%)`);
-  if (revenueGrowth < 0)      concerns.push(`Shrinking revenue (${revenueGrowth.toFixed(1)}%)`);
-  if (debtToEquity > 150)     concerns.push(`High leverage (D/E ${debtToEquity.toFixed(1)})`);
-  if (currentRatio > 0 && currentRatio < 1) concerns.push(`Low current ratio (${currentRatio.toFixed(2)})`);
-  if (beta > 2)               concerns.push(`High market volatility (beta ${beta.toFixed(2)})`);
-  if (payoutRatio > 100)      concerns.push(`Unsustainable payout ratio (${payoutRatio.toFixed(0)}%)`);
-  if (priceToSales > 15)      concerns.push(`Rich P/S ratio (${priceToSales.toFixed(1)}x)`);
+  if (peRatio > 40)                 concerns.push(`High P/E ratio (${peRatio.toFixed(1)}x) bakes in high growth expectations`);
+  else if (peRatio > 25)            concerns.push(`Valuation multiple (${peRatio.toFixed(1)}x P/E) offers limited margin of safety`);
+  if (pegRatio > 1.8)               concerns.push(`Elevated PEG ratio (${pegRatio.toFixed(2)}) signals premium pricing relative to growth`);
+  if (priceToSales > 8)             concerns.push(`High price-to-sales multiple (${priceToSales.toFixed(1)}x)`);
+  if (netMargin < 0)                concerns.push(`Negative net profit margin (${netMargin.toFixed(1)}%)`);
+  else if (netMargin < 12)          concerns.push(`Modest net margin (${netMargin.toFixed(1)}%) limits inflation cushion`);
+  if (epsGrowth < 0)                concerns.push(`Negative EPS growth (${epsGrowth.toFixed(1)}% YoY)`);
+  else if (epsGrowth < 8)           concerns.push(`Subdued earnings growth momentum (${epsGrowth.toFixed(1)}% YoY)`);
+  if (revenueGrowth < 0)            concerns.push(`Shrinking revenue top-line (${revenueGrowth.toFixed(1)}% YoY)`);
+  else if (revenueGrowth < 8)       concerns.push(`Sluggish revenue growth (${revenueGrowth.toFixed(1)}% YoY)`);
+  if (debtToEquity > 150)           concerns.push(`High debt-to-equity leverage (${debtToEquity.toFixed(1)}%)`);
+  else if (debtToEquity > 80)       concerns.push(`Elevated debt load (${debtToEquity.toFixed(1)}% D/E)`);
+  if (currentRatio > 0 && currentRatio < 1.2) concerns.push(`Tight current ratio liquidity (${currentRatio.toFixed(2)})`);
+  if (beta > 1.3)                   concerns.push(`Above-average stock volatility (beta ${beta.toFixed(2)})`);
+  if (payoutRatio > 80)             concerns.push(`Elevated payout ratio (${payoutRatio.toFixed(0)}%) limits reinvestment`);
 
-  // Ensure at least 3 of each
+  // Ensure at least 3 of each for thorough due diligence
   while (strengths.length < 3) {
     const fallbacks = [
-      `Established position in ${sector}`,
-      `Operational scale supports margins`,
-      `Analyst coverage reflects market relevance`,
+      `Established market presence in ${sector}`,
+      `Operational scale supports gross profitability`,
+      `Liquid trading volume supports execution`,
     ];
-    strengths.push(fallbacks[strengths.length] ?? 'Sector resilience');
+    strengths.push(fallbacks[strengths.length] ?? 'Sector positioning');
   }
   while (concerns.length < 3) {
     const fallbacks = [
-      `Macro sensitivity and rate risk`,
-      `Sector competition may compress margins`,
-      `Execution risk on growth initiatives`,
+      `Macro rate shifts could compress ${sector} valuation multiples`,
+      `Competitive headwinds in ${stock.industry || 'the industry'} may weigh on margins`,
+      `Execution risk on company growth initiatives`,
     ];
     concerns.push(fallbacks[concerns.length] ?? 'General market risk');
   }
