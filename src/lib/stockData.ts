@@ -356,23 +356,23 @@ const mockStocks: Record<string, StockFundamentals> = {
   },
 };
 
-const knownNames: Record<string, { name: string; sector: string; industry: string; price: number; eps: number }> = {
-  PGY: { name: 'Pagaya Technologies Ltd.', sector: 'Financial Services', industry: 'Financial Data & Stock Exchanges', price: 12.85, eps: 0.42 },
-  SPCX: { name: 'S&P 500 SPAC ETF', sector: 'Financial Services', industry: 'Exchange Traded Fund', price: 28.50, eps: 0.95 },
-  INTC: { name: 'Intel Corporation', sector: 'Technology', industry: 'Semiconductors', price: 20.45, eps: 0.85 },
-  DIS: { name: 'The Walt Disney Company', sector: 'Communication Services', industry: 'Entertainment', price: 95.80, eps: 4.25 },
-  NFLX: { name: 'Netflix, Inc.', sector: 'Communication Services', industry: 'Entertainment', price: 685.20, eps: 18.50 },
-  BABA: { name: 'Alibaba Group Holding Limited', sector: 'Consumer Cyclical', industry: 'Internet Retail', price: 84.50, eps: 6.20 },
-  SOFI: { name: 'SoFi Technologies, Inc.', sector: 'Financial Services', industry: 'Financial Data', price: 7.85, eps: 0.15 },
-  HOOD: { name: 'Robinhood Markets, Inc.', sector: 'Financial Services', industry: 'Capital Markets', price: 22.40, eps: 0.58 },
-  CRWD: { name: 'CrowdStrike Holdings, Inc.', sector: 'Technology', industry: 'Software - Infrastructure', price: 268.50, eps: 3.85 },
-  ARM: { name: 'Arm Holdings plc', sector: 'Technology', industry: 'Semiconductors', price: 128.40, eps: 1.45 },
-  RIVN: { name: 'Rivian Automotive, Inc.', sector: 'Consumer Cyclical', industry: 'Auto Manufacturers', price: 14.20, eps: -3.85 },
-  LCID: { name: 'Lucid Group, Inc.', sector: 'Consumer Cyclical', industry: 'Auto Manufacturers', price: 3.15, eps: -1.15 },
-  PYPL: { name: 'PayPal Holdings, Inc.', sector: 'Financial Services', industry: 'Credit Services', price: 68.50, eps: 4.15 },
-  SQ: { name: 'Block, Inc.', sector: 'Financial Services', industry: 'Credit Services', price: 64.20, eps: 2.18 },
-  SPY: { name: 'SPDR S&P 500 ETF Trust', sector: 'Financial Services', industry: 'Exchange Traded Fund', price: 545.20, eps: 22.50 },
-  QQQ: { name: 'Invesco QQQ Trust', sector: 'Technology', industry: 'Exchange Traded Fund', price: 475.80, eps: 18.20 },
+const knownNames: Record<string, { name: string; sector: string; industry: string; price: number; eps: number; dividendYield?: number; payoutRatio?: number }> = {
+  PGY: { name: 'Pagaya Technologies Ltd.', sector: 'Financial Services', industry: 'Financial Data & Stock Exchanges', price: 12.85, eps: 0.42, dividendYield: 0, payoutRatio: 0 },
+  SPCX: { name: 'The SPAC and New Issue ETF', sector: 'Financial Services', industry: 'Exchange Traded Fund', price: 28.50, eps: 0.95, dividendYield: 0, payoutRatio: 0 },
+  INTC: { name: 'Intel Corporation', sector: 'Technology', industry: 'Semiconductors', price: 20.45, eps: 0.85, dividendYield: 2.45, payoutRatio: 45.2 },
+  DIS: { name: 'The Walt Disney Company', sector: 'Communication Services', industry: 'Entertainment', price: 95.80, eps: 4.25, dividendYield: 0.95, payoutRatio: 22.4 },
+  NFLX: { name: 'Netflix, Inc.', sector: 'Communication Services', industry: 'Entertainment', price: 685.20, eps: 18.50, dividendYield: 0, payoutRatio: 0 },
+  BABA: { name: 'Alibaba Group Holding Limited', sector: 'Consumer Cyclical', industry: 'Internet Retail', price: 84.50, eps: 6.20, dividendYield: 2.15, payoutRatio: 28.5 },
+  SOFI: { name: 'SoFi Technologies, Inc.', sector: 'Financial Services', industry: 'Financial Data', price: 7.85, eps: 0.15, dividendYield: 0, payoutRatio: 0 },
+  HOOD: { name: 'Robinhood Markets, Inc.', sector: 'Financial Services', industry: 'Capital Markets', price: 22.40, eps: 0.58, dividendYield: 0, payoutRatio: 0 },
+  CRWD: { name: 'CrowdStrike Holdings, Inc.', sector: 'Technology', industry: 'Software - Infrastructure', price: 268.50, eps: 3.85, dividendYield: 0, payoutRatio: 0 },
+  ARM: { name: 'Arm Holdings plc', sector: 'Technology', industry: 'Semiconductors', price: 128.40, eps: 1.45, dividendYield: 0, payoutRatio: 0 },
+  RIVN: { name: 'Rivian Automotive, Inc.', sector: 'Consumer Cyclical', industry: 'Auto Manufacturers', price: 14.20, eps: -3.85, dividendYield: 0, payoutRatio: 0 },
+  LCID: { name: 'Lucid Group, Inc.', sector: 'Consumer Cyclical', industry: 'Auto Manufacturers', price: 3.15, eps: -1.15, dividendYield: 0, payoutRatio: 0 },
+  PYPL: { name: 'PayPal Holdings, Inc.', sector: 'Financial Services', industry: 'Credit Services', price: 68.50, eps: 4.15, dividendYield: 0, payoutRatio: 0 },
+  SQ: { name: 'Block, Inc.', sector: 'Financial Services', industry: 'Credit Services', price: 64.20, eps: 2.18, dividendYield: 0, payoutRatio: 0 },
+  SPY: { name: 'SPDR S&P 500 ETF Trust', sector: 'Financial Services', industry: 'Exchange Traded Fund', price: 545.20, eps: 22.50, dividendYield: 1.25, payoutRatio: 32.5 },
+  QQQ: { name: 'Invesco QQQ Trust', sector: 'Technology', industry: 'Exchange Traded Fund', price: 475.80, eps: 18.20, dividendYield: 0.58, payoutRatio: 18.4 },
 };
 
 function generateDynamicStockData(symbol: string): StockFundamentals {
@@ -394,6 +394,18 @@ function generateDynamicStockData(symbol: string): StockFundamentals {
 
   const fiftyTwoWeekLow = Number((price * 0.72).toFixed(2));
   const fiftyTwoWeekHigh = Number((price * 1.38).toFixed(2));
+
+  const isNonDividend = known?.dividendYield !== undefined
+    ? known.dividendYield === 0
+    : symbol.includes('SPCX') || symbol.includes('SPAC') || hash % 4 !== 0;
+
+  const dividendYield = known?.dividendYield !== undefined
+    ? known.dividendYield
+    : (isNonDividend ? 0 : Number(((hash % 30) / 10).toFixed(2)));
+
+  const payoutRatio = known?.payoutRatio !== undefined
+    ? known.payoutRatio
+    : (dividendYield === 0 ? 0 : Number(((hash % 25) + 15).toFixed(1)));
 
   return {
     symbol,
@@ -420,8 +432,8 @@ function generateDynamicStockData(symbol: string): StockFundamentals {
     roa: Number(((hash % 15) + 5).toFixed(1)),
     debtToEquity: Number(((hash % 80) + 10).toFixed(1)),
     currentRatio: Number(((hash % 20) / 10 + 1.1).toFixed(2)),
-    dividendYield: hash % 3 === 0 ? Number(((hash % 40) / 10).toFixed(2)) : 0,
-    payoutRatio: hash % 3 === 0 ? Number(((hash % 30) + 15).toFixed(1)) : 0,
+    dividendYield,
+    payoutRatio,
     beta: Number(((hash % 15) / 10 + 0.8).toFixed(2)),
     fiftyTwoWeekHigh,
     fiftyTwoWeekLow,
