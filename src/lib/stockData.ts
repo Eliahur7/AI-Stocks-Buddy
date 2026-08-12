@@ -103,32 +103,32 @@ const mockStocks: Record<string, StockFundamentals> = {
     companyName: 'NVIDIA Corporation',
     sector: 'Technology',
     industry: 'Semiconductors',
-    price: 495.22,
-    change: 12.87,
-    changePercent: 2.67,
-    marketCap: 1220000000000,
-    peRatio: 65.3,
-    forwardPE: 28.4,
-    pegRatio: 1.2,
-    priceToBook: 38.5,
-    priceToSales: 22.8,
-    eps: 7.59,
-    epsGrowth: 586.2,
-    revenue: 61000000000,
-    revenueGrowth: 122.4,
-    grossMargin: 72.7,
-    operatingMargin: 54.1,
-    netMargin: 48.9,
-    roe: 91.5,
-    roa: 45.3,
-    debtToEquity: 41.2,
-    currentRatio: 4.17,
-    dividendYield: 0.04,
-    payoutRatio: 1.1,
-    beta: 1.72,
-    fiftyTwoWeekHigh: 502.66,
-    fiftyTwoWeekLow: 222.97,
-    averageVolume: 52000000,
+    price: 217.50,
+    change: 3.25,
+    changePercent: 1.52,
+    marketCap: 5300000000000,
+    peRatio: 33.2,
+    forwardPE: 24.1,
+    pegRatio: 1.1,
+    priceToBook: 28.5,
+    priceToSales: 21.2,
+    eps: 6.55,
+    epsGrowth: 68.5,
+    revenue: 118000000000,
+    revenueGrowth: 86.4,
+    grossMargin: 75.2,
+    operatingMargin: 62.1,
+    netMargin: 55.4,
+    roe: 112.5,
+    roa: 52.3,
+    debtToEquity: 18.5,
+    currentRatio: 3.85,
+    dividendYield: 0.08,
+    payoutRatio: 2.1,
+    beta: 1.68,
+    fiftyTwoWeekHigh: 219.80,
+    fiftyTwoWeekLow: 90.60,
+    averageVolume: 48000000,
   },
   JPM: {
     symbol: 'JPM',
@@ -1007,9 +1007,19 @@ const mockStocks: Record<string, StockFundamentals> = {
 
 export function getStockData(symbol: string): StockFundamentals | null {
   const upperSymbol = symbol.toUpperCase().trim();
-  const stock = mockStocks[upperSymbol];
+  const rawStock = mockStocks[upperSymbol];
   
-  if (stock && !stock.technicals) {
+  if (!rawStock) return null;
+
+  // Clone object to avoid mutating raw template
+  const stock: StockFundamentals = { ...rawStock };
+
+  // Enforce mathematical consistency: P/E ratio = price / eps when eps > 0
+  if (stock.eps > 0) {
+    stock.peRatio = Number((stock.price / stock.eps).toFixed(1));
+  }
+
+  if (!stock.technicals) {
     // Generate plausible technicals based on price and change
     const isPositive = stock.changePercent >= 0;
     const rsiBase = isPositive ? 55 : 45;
@@ -1029,7 +1039,7 @@ export function getStockData(symbol: string): StockFundamentals | null {
     };
   }
   
-  return stock || null;
+  return stock;
 }
 
 export function analyzeTechnicals(technicals: TechnicalIndicators): TechnicalAnalysis {
