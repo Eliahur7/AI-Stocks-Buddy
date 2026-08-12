@@ -28,7 +28,7 @@ export function TechnicalAnalysisCard({ technicals, symbol }: TechnicalAnalysisC
   };
 
   return (
-    <Card className="glass-card mt-6">
+    <Card className="glass-card">
       <CardHeader className="pb-2 border-b border-border/50">
         <CardTitle className="flex items-center gap-2 text-lg">
           <Bot className="h-6 w-6 text-primary" />

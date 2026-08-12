@@ -12,7 +12,6 @@ import { NewsFeed } from '@/components/NewsFeed';
 import { useStockData } from '@/hooks/useStockData';
 import { useFundamentalsExpert } from '@/hooks/useFundamentalsExpert';
 import { AlertCircle, LineChart } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/toaster';
 
 const Index = () => {
@@ -33,11 +32,11 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {/* Background gradient */}
       <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none" />
-      
+
       {/* Header with user menu */}
       <header className="relative z-20 border-b border-border/50 sticky top-0 bg-background/80 backdrop-blur-md">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
-          <div 
+        <div className="max-w-[1440px] mx-auto px-4 md:px-6 py-3 flex items-center justify-between gap-4">
+          <div
             className="flex items-center gap-2 hidden sm:flex cursor-pointer hover:opacity-80 transition-opacity"
             onClick={reset}
           >
@@ -55,14 +54,14 @@ const Index = () => {
         </div>
       </header>
 
-      <div className="relative z-10 container mx-auto px-4 py-4 md:py-6">
+      <div className="relative z-10 max-w-[1440px] mx-auto px-4 md:px-6 py-4 md:py-6">
         {error && !stock && (
           <div className="mb-6 flex items-center justify-center gap-2 text-destructive bg-destructive/10 px-4 py-3 rounded-lg animate-fade-in max-w-lg mx-auto">
             <AlertCircle className="h-5 w-5 flex-shrink-0" />
             <span>{error}</span>
           </div>
         )}
-        
+
         {!stock ? (
           <div className="flex flex-col items-center justify-center min-h-[50vh] animate-fade-in">
             <div className="glass-card p-8 text-center max-w-md w-full">
@@ -73,19 +72,19 @@ const Index = () => {
             </div>
           </div>
         ) : (
-          <div className="space-y-4 max-w-6xl mx-auto">
+          <div className="space-y-4 max-w-[1440px] mx-auto">
             {/* Stock Header */}
             <StockHeader stock={stock} />
 
             <div className="grid lg:grid-cols-3 gap-4">
-              {/* Main Column - takes 2 columns on large screens */}
-              <div className="lg:col-span-2 flex flex-col gap-6">
+              {/* Main Column - 2 columns on large screens */}
+              <div className="lg:col-span-2 flex flex-col gap-4">
                 {stock.historical && (
                   <StockChart data={stock.historical} changePercent={stock.changePercent} />
                 )}
                 <FundamentalsGrid stock={stock} />
 
-                {/* Fundamentals Expert Agent — below the 52-week range */}
+                {/* Fundamentals Expert Agent */}
                 <FundamentalsExpertCard
                   analysis={expertAnalysis}
                   isLoading={isExpertLoading}
@@ -94,10 +93,15 @@ const Index = () => {
                   onRun={() => runExpertAnalysis(stock)}
                   hasStock={true}
                 />
+
+                {/* Technical Expert Agent — placed directly under Fundamentals Expert */}
+                {stock.technicals && (
+                  <TechnicalAnalysisCard technicals={stock.technicals} symbol={stock.symbol} />
+                )}
               </div>
 
-              {/* Sidebar Column - takes 1 column */}
-              <div className="lg:col-span-1 flex flex-col gap-6">
+              {/* Sidebar Column - 1 column */}
+              <div className="lg:col-span-1 flex flex-col gap-4">
                 {isAnalysisLoading ? (
                   <div className="glass-card p-6 flex flex-col items-center justify-center min-h-[300px]">
                     <div className="h-10 w-10 rounded-full border-4 border-primary border-t-transparent animate-spin mb-4" />
@@ -115,14 +119,9 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Technical Analysis Section */}
-            {stock.technicals && (
-              <TechnicalAnalysisCard technicals={stock.technicals} symbol={stock.symbol} />
-            )}
-
             {/* Disclaimer */}
-            <div className="glass-card p-4 text-center text-xs text-muted-foreground mt-8">
-              <strong>Disclaimer:</strong> This analysis is for educational purposes only and should not be considered financial advice. 
+            <div className="glass-card p-3 text-center text-xs text-muted-foreground mt-4">
+              <strong>Disclaimer:</strong> This analysis is for educational purposes only and should not be considered financial advice.
               Always do your own research and consult with a qualified financial advisor before making investment decisions.
             </div>
           </div>
