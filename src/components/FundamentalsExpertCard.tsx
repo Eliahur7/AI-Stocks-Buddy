@@ -186,29 +186,30 @@ export function FundamentalsExpertCard({
 
       {/* Not yet run — CTA */}
       {!analysis && !isLoading && !error && (
-        <div className="text-center py-4 space-y-4">
+        <div className="text-center py-2 space-y-2.5">
           <div className="flex justify-center">
             <div className="relative">
-              <div className="w-20 h-20 rounded-full border-4 border-dashed border-primary/30 flex items-center justify-center">
-                <Star className="h-8 w-8 text-primary/40" />
+              <div className="w-12 h-12 rounded-full border-2 border-dashed border-primary/40 flex items-center justify-center">
+                <Star className="h-5 w-5 text-primary/60" />
               </div>
-              <div className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+              <div className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
                 ?
               </div>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground max-w-[240px] mx-auto">
-            Run a deep fundamental analysis of{' '}
-            <span className="font-mono font-semibold text-foreground">{symbol}</span> across 6 key dimensions, scored 1–10.
+          <p className="text-xs text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis px-2">
+            Run a deep fundamental analysis of <span className="font-mono font-semibold text-foreground">{symbol}</span> across 6 key dimensions, scored 1–10.
           </p>
-          <button
-            onClick={onRun}
-            className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold text-sm px-5 py-2.5 rounded-lg hover:bg-primary/90 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary/25"
-          >
-            <Brain className="h-4 w-4" />
-            Analyze Fundamentals
-            <ChevronRight className="h-4 w-4" />
-          </button>
+          <div>
+            <button
+              onClick={onRun}
+              className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground font-semibold text-xs px-4 py-2 rounded-lg hover:bg-primary/90 transition-all hover:scale-105 active:scale-95 shadow-md shadow-primary/20"
+            >
+              <Brain className="h-3.5 w-3.5" />
+              Analyze Fundamentals
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
       )}
 
