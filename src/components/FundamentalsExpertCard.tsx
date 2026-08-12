@@ -169,7 +169,7 @@ export function FundamentalsExpertCard({
     : [];
 
   return (
-    <div className="glass-card p-6 space-y-5 animate-fade-in">
+    <div className="glass-card p-4 space-y-4 animate-fade-in">
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="bg-primary/10 p-2 rounded-lg">
@@ -243,7 +243,7 @@ export function FundamentalsExpertCard({
       {analysis && !isLoading && (
         <div className="space-y-5">
           {/* Overall Score Hero */}
-          <div className={`rounded-xl border p-5 flex items-center gap-5 ${overallBorder}`}>
+          <div className={`rounded-xl border p-4 flex items-center gap-4 ${overallBorder}`}>
             <ScoreRing score={analysis.overallScore} size="lg" />
             <div className="min-w-0">
               <div className={`text-xl font-bold ${overallColor}`}>
@@ -266,16 +266,16 @@ export function FundamentalsExpertCard({
           </div>
 
           {/* Dimension Scores */}
-          <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-foreground">Dimension Breakdown</h4>
+          <div className="space-y-3">
+            <h4 className="text-xs font-semibold text-foreground">Dimension Breakdown</h4>
             {dimensions.map((d) => (
               <DimensionRow key={d.label} {...d} />
             ))}
           </div>
 
           {/* Strengths & Concerns */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="glass-card p-4 space-y-2">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="glass-card p-3 space-y-1.5">
               <h4 className="text-xs font-semibold text-success flex items-center gap-1.5">
                 <ShieldCheck className="h-3.5 w-3.5" />
                 Strengths
@@ -289,7 +289,7 @@ export function FundamentalsExpertCard({
                 ))}
               </ul>
             </div>
-            <div className="glass-card p-4 space-y-2">
+            <div className="glass-card p-3 space-y-1.5">
               <h4 className="text-xs font-semibold text-destructive flex items-center gap-1.5">
                 <AlertTriangle className="h-3.5 w-3.5" />
                 Concerns
@@ -306,7 +306,7 @@ export function FundamentalsExpertCard({
           </div>
 
           {/* Investor Profile */}
-          <div className="glass-card p-4 flex items-start gap-3 border border-primary/20 bg-primary/5">
+          <div className="glass-card p-3 flex items-start gap-2 border border-primary/20 bg-primary/5">
             <Users className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-xs font-semibold text-foreground mb-0.5">Best Suited For</p>

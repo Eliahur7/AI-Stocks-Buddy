@@ -50,6 +50,25 @@ async function fetchAiAnalysis(fundamentals: StockFundamentals): Promise<StockAn
   }
 }
 
+/**
+ * Confidence gate — industry research consensus:
+ * Below 60% confidence the signal is noise; override buy/sell to hold.
+ * Applied to BOTH AI and local results so the rule is always enforced.
+ */
+function applyConfidenceGate(analysis: StockAnalysis): StockAnalysis {
+  if (analysis.confidence < 60 && analysis.recommendation !== 'hold') {
+    return {
+      ...analysis,
+      recommendation: 'hold',
+      summary: analysis.summary.replace(
+        /^(.*?)\./, // replace first sentence
+        `Insufficient conviction for a directional call at ${analysis.confidence}% confidence — defaulting to Hold.`
+      ),
+    };
+  }
+  return analysis;
+}
+
 /** Generate technicals locally from price/change data when not provided by the API. */
 function generateTechnicals(stock: StockFundamentals): TechnicalIndicators {
   const isPositive = stock.changePercent >= 0;
@@ -110,9 +129,10 @@ export function useStockData(): UseStockDataReturn {
 
       // 4. Fetch AI analysis (Gemini) in background, fall back to local scoring
       fetchAiAnalysis(result).then((aiResult) => {
-        setAnalysis(aiResult ?? analyzeStock(result!));
+        const raw = aiResult ?? analyzeStock(result!);
+        setAnalysis(applyConfidenceGate(raw));
       }).catch(() => {
-        setAnalysis(analyzeStock(result!));
+        setAnalysis(applyConfidenceGate(analyzeStock(result!)));
       }).finally(() => {
         setIsAnalysisLoading(false);
       });

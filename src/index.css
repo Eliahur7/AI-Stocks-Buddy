@@ -94,7 +94,7 @@
   }
 
   .stat-card {
-    @apply glass-card p-4 hover:border-primary/30 transition-all duration-300;
+    @apply glass-card p-3 hover:border-primary/30 transition-all duration-300;
   }
 }
 

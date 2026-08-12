@@ -1160,7 +1160,7 @@ export function analyzeStock(fundamentals: StockFundamentals): StockAnalysis {
     risks.push('Trading near 52-week highs may limit upside');
   }
 
-  // Determine recommendation
+  // Determine recommendation from score
   let recommendation: Recommendation;
   if (score >= 65) {
     recommendation = 'buy';
@@ -1170,8 +1170,18 @@ export function analyzeStock(fundamentals: StockFundamentals): StockAnalysis {
     recommendation = 'hold';
   }
 
-  // Normalize confidence
-  const confidence = Math.min(Math.max(Math.abs(score - 50) * 2, 30), 95);
+  // Normalize confidence: distance from neutral (50), scaled to 0-100
+  const rawConfidence = Math.abs(score - 50) * 2;
+  const confidence = Math.min(Math.max(rawConfidence, 10), 95);
+
+  // ── Confidence gate ──────────────────────────────────────────────────────────
+  // Research consensus: below 60% confidence the signal is noise.
+  // A low-conviction "buy" or "sell" is more dangerous than a "hold".
+  // Override to hold when the model isn't sure enough to take a directional view.
+  if (confidence < 60 && recommendation !== 'hold') {
+    recommendation = 'hold';
+  }
+  // ─────────────────────────────────────────────────────────────────────────────
 
   // Generate summary
   let summary: string;
@@ -1179,13 +1189,15 @@ export function analyzeStock(fundamentals: StockFundamentals): StockAnalysis {
     summary = `${fundamentals.companyName} presents a compelling investment opportunity. The company demonstrates strong fundamentals with ${reasons.slice(0, 2).join(' and ').toLowerCase()}. While investors should monitor ${risks[0]?.toLowerCase() || 'general market conditions'}, the overall risk-reward profile favors accumulation.`;
   } else if (recommendation === 'sell') {
     summary = `${fundamentals.companyName} faces several headwinds that warrant caution. Key concerns include ${risks.slice(0, 2).join(' and ').toLowerCase()}. Consider reducing exposure or taking profits on any rallies until fundamentals improve.`;
+  } else if (confidence < 60) {
+    summary = `${fundamentals.companyName} shows a mixed fundamental picture with insufficient conviction for a directional call (confidence: ${Math.round(confidence)}%). Positives include ${reasons[0]?.toLowerCase() || 'stable operations'}, but risks around ${risks[0]?.toLowerCase() || 'valuation'} offset the upside. A hold is recommended until the picture clarifies.`;
   } else {
     summary = `${fundamentals.companyName} presents a mixed picture. While there are positives like ${reasons[0]?.toLowerCase() || 'stable operations'}, concerns around ${risks[0]?.toLowerCase() || 'valuation'} suggest waiting for a better entry point or catalyst.`;
   }
 
   return {
     recommendation,
-    confidence,
+    confidence: Math.round(confidence),
     reasons: reasons.slice(0, 4),
     risks: risks.slice(0, 4),
     summary,

@@ -55,7 +55,7 @@ const Index = () => {
         </div>
       </header>
 
-      <div className="relative z-10 container mx-auto px-4 py-6 md:py-8">
+      <div className="relative z-10 container mx-auto px-4 py-4 md:py-6">
         {error && !stock && (
           <div className="mb-6 flex items-center justify-center gap-2 text-destructive bg-destructive/10 px-4 py-3 rounded-lg animate-fade-in max-w-lg mx-auto">
             <AlertCircle className="h-5 w-5 flex-shrink-0" />
@@ -73,17 +73,27 @@ const Index = () => {
             </div>
           </div>
         ) : (
-          <div className="space-y-6 max-w-6xl mx-auto">
+          <div className="space-y-4 max-w-6xl mx-auto">
             {/* Stock Header */}
             <StockHeader stock={stock} />
 
-            <div className="grid lg:grid-cols-3 gap-6">
+            <div className="grid lg:grid-cols-3 gap-4">
               {/* Main Column - takes 2 columns on large screens */}
               <div className="lg:col-span-2 flex flex-col gap-6">
                 {stock.historical && (
                   <StockChart data={stock.historical} changePercent={stock.changePercent} />
                 )}
                 <FundamentalsGrid stock={stock} />
+
+                {/* Fundamentals Expert Agent — below the 52-week range */}
+                <FundamentalsExpertCard
+                  analysis={expertAnalysis}
+                  isLoading={isExpertLoading}
+                  error={expertError}
+                  symbol={stock.symbol}
+                  onRun={() => runExpertAnalysis(stock)}
+                  hasStock={true}
+                />
               </div>
 
               {/* Sidebar Column - takes 1 column */}
@@ -96,16 +106,6 @@ const Index = () => {
                 ) : analysis ? (
                   <RecommendationCard analysis={analysis} symbol={stock.symbol} />
                 ) : null}
-
-                {/* Fundamentals Expert Agent */}
-                <FundamentalsExpertCard
-                  analysis={expertAnalysis}
-                  isLoading={isExpertLoading}
-                  error={expertError}
-                  symbol={stock.symbol}
-                  onRun={() => runExpertAnalysis(stock)}
-                  hasStock={true}
-                />
 
                 {stock.news && stock.news.length > 0 && (
                   <div className="h-[400px]">
