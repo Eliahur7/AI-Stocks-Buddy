@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="100%" stop-color="#061812" />
+    </linearGradient>
+    <linearGradient id="lineGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="50%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#22d3ee" />
+    </linearGradient>
+    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)" stroke="#10b981" stroke-width="8" stroke-opacity="0.3" />
+  
+  <!-- Subtle Ambient Circle -->
+  <circle cx="256" cy="256" r="180" fill="url(#glowGrad)" />
+
+  <!-- Grid lines -->
+  <path d="M 96 160 H 416 M 96 256 H 416 M 96 352 H 416" stroke="#ffffff" stroke-opacity="0.06" stroke-width="4" stroke-dasharray="8 8" />
+
+  <!-- Stock Trend Line -->
+  <path d="M 96 352 L 192 288 L 272 320 L 416 160" fill="none" stroke="url(#lineGrad)" stroke-width="28" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" />
+
+  <!-- Data Point Node -->
+  <circle cx="416" cy="160" r="22" fill="#22d3ee" stroke="#ffffff" stroke-width="6" />
+
+  <!-- Sparkle Star (AI Indicator) -->
+  <path d="M 330 110 Q 330 140 360 140 Q 330 140 330 170 Q 330 140 300 140 Q 330 140 330 110 Z" fill="#34d399" />
+</svg>
