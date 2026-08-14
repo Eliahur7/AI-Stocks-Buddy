@@ -331,12 +331,12 @@ const mockStocks: Record<string, StockFundamentals> = {
     change: 3.20,
     changePercent: 2.30,
     marketCap: 230000000000,
-    peRatio: 77.0,
-    forwardPE: 28.5,
+    peRatio: 127.2,
+    forwardPE: 63.3,
     pegRatio: 1.4,
     priceToBook: 4.2,
     priceToSales: 9.6,
-    eps: 1.85,
+    eps: 1.12,
     epsGrowth: 45.2,
     revenue: 24200000000,
     revenueGrowth: 8.8,
@@ -354,9 +354,43 @@ const mockStocks: Record<string, StockFundamentals> = {
     fiftyTwoWeekLow: 116.50,
     averageVolume: 52000000,
   },
+  ANET: {
+    symbol: 'ANET',
+    companyName: 'Arista Networks, Inc.',
+    sector: 'Technology',
+    industry: 'Software - Application',
+    price: 115.00,
+    change: 1.25,
+    changePercent: 1.10,
+    marketCap: 125000000000,
+    peRatio: 39.5,
+    forwardPE: 32.0,
+    pegRatio: 1.80,
+    priceToBook: 12.5,
+    priceToSales: 14.2,
+    eps: 2.91,
+    epsGrowth: 28.5,
+    revenue: 7200000000,
+    revenueGrowth: 20.5,
+    grossMargin: 64.2,
+    operatingMargin: 41.5,
+    netMargin: 36.8,
+    roe: 33.5,
+    roa: 18.2,
+    debtToEquity: 0.0,
+    currentRatio: 3.85,
+    dividendYield: 0,
+    payoutRatio: 0,
+    beta: 1.15,
+    fiftyTwoWeekHigh: 138.50,
+    fiftyTwoWeekLow: 82.10,
+    averageVolume: 9500000,
+  },
 };
 
 const knownNames: Record<string, { name: string; sector: string; industry: string; price: number; eps: number; dividendYield?: number; payoutRatio?: number }> = {
+  AMD: { name: 'Advanced Micro Devices, Inc.', sector: 'Technology', industry: 'Semiconductors', price: 142.50, eps: 1.12, dividendYield: 0, payoutRatio: 0 },
+  ANET: { name: 'Arista Networks, Inc.', sector: 'Technology', industry: 'Software - Application', price: 115.00, eps: 2.91, dividendYield: 0, payoutRatio: 0 },
   PGY: { name: 'Pagaya Technologies Ltd.', sector: 'Financial Services', industry: 'Financial Data & Stock Exchanges', price: 12.85, eps: 0.42, dividendYield: 0, payoutRatio: 0 },
   SPCX: { name: 'The SPAC and New Issue ETF', sector: 'Financial Services', industry: 'Exchange Traded Fund', price: 28.50, eps: 0.95, dividendYield: 0, payoutRatio: 0 },
   INTC: { name: 'Intel Corporation', sector: 'Technology', industry: 'Semiconductors', price: 20.45, eps: 0.85, dividendYield: 2.45, payoutRatio: 45.2 },
@@ -395,17 +429,9 @@ function generateDynamicStockData(symbol: string): StockFundamentals {
   const fiftyTwoWeekLow = Number((price * 0.72).toFixed(2));
   const fiftyTwoWeekHigh = Number((price * 1.38).toFixed(2));
 
-  const isNonDividend = known?.dividendYield !== undefined
-    ? known.dividendYield === 0
-    : symbol.includes('SPCX') || symbol.includes('SPAC') || hash % 4 !== 0;
-
-  const dividendYield = known?.dividendYield !== undefined
-    ? known.dividendYield
-    : (isNonDividend ? 0 : Number(((hash % 30) / 10).toFixed(2)));
-
-  const payoutRatio = known?.payoutRatio !== undefined
-    ? known.payoutRatio
-    : (dividendYield === 0 ? 0 : Number(((hash % 25) + 15).toFixed(1)));
+  // Dividend safety: Only assign non-zero dividend yield if explicitly specified in verified profiles.
+  const dividendYield = known?.dividendYield !== undefined ? known.dividendYield : 0;
+  const payoutRatio = known?.payoutRatio !== undefined ? known.payoutRatio : 0;
 
   return {
     symbol,
