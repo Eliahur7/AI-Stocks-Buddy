@@ -1,7 +1,7 @@
 # 📈 AI Stocks Buddy
 
-[![GitHub Stars](https://img.shields.io/github/stars/Eliahur7/AI-Stocks-Buddy?style=social)](https://github.com/Eliahur7/AI-Stocks-Buddy)
-[![GitHub Forks](https://img.shields.io/github/forks/Eliahur7/AI-Stocks-Buddy?style=social)](https://github.com/Eliahur7/AI-Stocks-Buddy)
+[![GitHub Stars](https://img.shields.io/github/stars/ran-eliahu/AI-Stocks-Buddy?style=social)](https://github.com/ran-eliahu/AI-Stocks-Buddy)
+[![GitHub Forks](https://img.shields.io/github/forks/ran-eliahu/AI-Stocks-Buddy?style=social)](https://github.com/ran-eliahu/AI-Stocks-Buddy)
 [![React](https://img.shields.io/badge/React-18.3-blue.svg?logo=react)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue.svg?logo=typescript)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.4-purple.svg?logo=vite)](https://vitejs.dev/)
@@ -139,7 +139,7 @@ To emulate institutional risk management and prevent trading on market noise, AI
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/Eliahur7/AI-Stocks-Buddy.git
+git clone https://github.com/ran-eliahu/AI-Stocks-Buddy.git
 cd AI-Stocks-Buddy
 ```
 
